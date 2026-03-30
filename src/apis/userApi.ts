@@ -3,7 +3,7 @@ import type { User, QueryParams } from '@/types';
 
 export interface ListRes {
   data: User[];
-  tatal: number;
+  total: number;
 }
 
 export const userApi = {
