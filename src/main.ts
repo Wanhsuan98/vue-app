@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
-import './style.css';
 import App from './App.vue';
+import './assets/style/main.css';
+
+import './apis/mockApi';
 
 createApp(App).mount('#app');
