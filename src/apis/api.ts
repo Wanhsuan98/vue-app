@@ -4,7 +4,7 @@ import type { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axio
 const api = axios.create({
   baseURL: '/api',
   timeout: 10000,
-  headers: { 'Content-Type': 'appliction/json' },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 // Request intercepter
