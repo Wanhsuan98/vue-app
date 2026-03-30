@@ -25,16 +25,33 @@ const STATIC_USER: User = {
   birthdate: '1981-03-30',
 };
 mockDatabase.push(STATIC_USER);
-const STATIC_INDEX = 1;
 
 mock.onGet('/users').reply((config) => {
   const params = config.params as QueryParams;
-  const { q, sortBy, order, page, limit } = params;
+  const { q = '', sortBy, order, page, limit } = params;
+  const keyword = q.toLowerCase().trim();
 
-  const filtered = mockDatabase.filter(
-    (u) => u.name.includes(q) || u.position.includes(q) || u.location.includes(q),
-  );
+  // 過濾
+  const filtered = mockDatabase.filter((u) => {
+    if (!keyword) return true;
+    return (
+      u.name.toLowerCase().includes(keyword) ||
+      u.position.toLowerCase().includes(keyword) ||
+      u.location.toLowerCase().includes(keyword) ||
+      String(u.age).includes(keyword)
+    );
+  });
 
+  const staticIndex = filtered.findIndex((u) => u.id === STATIC_USER.id);
+  let returnedStaticUser = null;
+
+  if (staticIndex > -1) {
+    returnedStaticUser = filtered[staticIndex];
+    // 從列表裡移除
+    filtered.splice(staticIndex, 1);
+  }
+
+  // 排序
   if (sortBy) {
     filtered.sort((a, b) => {
       const valueA = a[sortBy as keyof User];
@@ -45,17 +62,18 @@ mock.onGet('/users').reply((config) => {
     });
   }
 
-  const staticIndex = filtered.findIndex((u) => u.id === STATIC_USER.id);
-  if (staticIndex > -1) filtered.splice(staticIndex, 1);
-
-  if (page === 1 && filtered.length >= STATIC_INDEX) {
-    filtered.splice(STATIC_INDEX, 0, STATIC_USER);
-  }
-
+  // 分頁
   const start = (page - 1) * limit;
   const pagination = filtered.slice(start, start + limit);
 
-  return [200, { data: pagination, total: filtered.length }];
+  return [
+    200,
+    {
+      data: pagination,
+      total: filtered.length,
+      staticUser: returnedStaticUser,
+    },
+  ];
 });
 
 mock.onDelete(/\/users\/u_\d+/).reply((config) => {

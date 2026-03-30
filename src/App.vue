@@ -1,3 +1,7 @@
 <template>
-  <h1>Project Initialized</h1>
+  <UserList />
 </template>
+
+<script setup lang="ts">
+import UserList from './views/UserList.vue';
+</script>
