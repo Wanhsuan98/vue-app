@@ -7,6 +7,7 @@ import { debounce } from '@/utils/debounce';
 export function useUserManagement() {
   // --- refs ---
   const users = ref<User[]>([]);
+  const staticUser = ref<User | null>(null);
   const isLoading = ref(false);
   const isError = ref<string | null>(null);
   const totalCount = ref(0);
@@ -34,7 +35,14 @@ export function useUserManagement() {
     isError.value = null;
 
     try {
-      const { data, total } = await userApi.getList(queryParams.value, abortController.signal);
+      const {
+        data,
+        total,
+        staticUser: fetchedStaticUser,
+      } = await userApi.getList(queryParams.value, abortController.signal);
+      if (!isLoadMore) {
+        staticUser.value = fetchedStaticUser || null;
+      }
       if (isLoadMore) {
         users.value.push(...data);
       } else {
@@ -48,7 +56,7 @@ export function useUserManagement() {
         return;
       }
       const error = err as Error;
-      isError.value = error.message || '無法獲取資料';
+      isError.value = error.message || '無法獲取使用者資料';
       console.error('[Fetch Users Error]:', error);
     } finally {
       isLoading.value = false;
@@ -81,6 +89,7 @@ export function useUserManagement() {
 
   return {
     users,
+    staticUser,
     isLoading,
     isError,
     totalCount,

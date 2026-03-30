@@ -4,6 +4,7 @@ import type { User, QueryParams } from '@/types';
 export interface ListRes {
   data: User[];
   total: number;
+  staticUser: User | null;
 }
 
 export const userApi = {
