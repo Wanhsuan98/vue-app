@@ -34,14 +34,14 @@
             @edit="openModal"
             @delete="triggerDeleteModal"
           />
+        </div>
 
-          <div
-            ref="bottomTrigger"
-            class="flex h-[50px] items-center justify-center text-sm text-gray-400"
-          >
-            <span v-if="isLoading">Loading more data...</span>
-            <span v-else-if="!hasMore">No more users.</span>
-          </div>
+        <div
+          ref="bottomTrigger"
+          class="flex h-[50px] items-center justify-center text-sm text-gray-400"
+        >
+          <span v-if="isLoading">Loading more data...</span>
+          <span v-else-if="!hasMore">No more users.</span>
         </div>
       </div>
     </main>
@@ -114,7 +114,7 @@ const {
   containerProps,
   wrapperProps,
 } = useVirtualList(users, {
-  itemHeight: 120,
+  itemHeight: 72,
   overscan: 5,
 });
 
