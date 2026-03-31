@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex flex-col gap-0.5 p-2 border-b border-gray-100 transition-colors h-[96px] overflow-hidden md:grid md:grid-cols-5 md:items-center md:gap-4 md:p-4 md:h-[72px]"
+    class="relative flex flex-col gap-0.5 p-2 border-b border-gray-100 transition-colors h-[120px] overflow-hidden md:grid md:grid-cols-6 md:items-center md:gap-4 md:p-4 md:h-[72px]"
     :class="[isStatic ? 'bg-sky-50 hover:bg-sky-100' : 'bg-white hover:bg-gray-50']"
   >
     <div
@@ -50,6 +50,7 @@ const listFields: { key: keyof User; label: string; customClass: string }[] = [
   { key: 'name', label: 'Name', customClass: 'font-medium text-gray-900 pr-16 md:pr-0' },
   { key: 'position', label: 'Position', customClass: 'text-gray-600' },
   { key: 'age', label: 'Age', customClass: 'text-gray-600' },
+  { key: 'birthdate', label: 'Birthdate', customClass: 'text-gray-600' },
   { key: 'location', label: 'Location', customClass: 'text-gray-600' },
 ];
 </script>
