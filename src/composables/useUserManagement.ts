@@ -12,9 +12,24 @@ export function useUserManagement() {
   const isError = ref<string | null>(null);
   const totalCount = ref(0);
   const hasMore = ref(true);
+
+  // edit modal
   const isModalOpen = ref(false);
   const isEditing = ref(false);
   const editingId = ref<string | null>(null);
+
+  // delete modal
+  const isdelModalOpen = ref(false);
+  const delId = ref<string | null>(null);
+  const isDeletedPermanently = ref(false);
+
+  // toast
+  type ToastType = 'success' | 'error';
+  const toastMessage = ref('');
+  const toastType = ref<ToastType>('success');
+  const showToast = ref(false);
+
+  let toastTimer: number | null = null;
 
   const queryParams = ref<QueryParams>({
     q: '',
@@ -51,7 +66,7 @@ export function useUserManagement() {
         total,
         staticUser: fetchedStaticUser,
       } = await userApi.getList(queryParams.value, abortController.signal);
-      if (!isLoadMore) {
+      if (!isDeletedPermanently.value && !isLoadMore) {
         staticUser.value = fetchedStaticUser || null;
       }
       if (isLoadMore) {
@@ -92,15 +107,42 @@ export function useUserManagement() {
     fetchUsers(false);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure to delete this user?')) return;
+  const triggerDeleteModal = (id: string) => {
+    delId.value = id;
+    isdelModalOpen.value = true;
+  };
+
+  const handleDelete = async () => {
+    if (!delId.value) return;
+    const targetId = delId.value;
+    isdelModalOpen.value = false;
+
     try {
-      await userApi.remove(id);
+      if (delId.value === 'Leader_1') {
+        staticUser.value = null;
+        isDeletedPermanently.value = true;
+      }
+
+      await userApi.remove(targetId);
+      triggerToast(`User ${targetId} deleted successfully`);
+
       queryParams.value.page = 1;
-      fetchUsers();
+      await fetchUsers();
     } catch (error) {
+      triggerToast('Delete failed', 'error');
+      if (targetId === 'Leader_1') {
+        isDeletedPermanently.value = false;
+        await fetchUsers();
+      }
       console.error('Delete failed', error);
+    } finally {
+      delId.value = null;
     }
+  };
+
+  const closeDelModal = () => {
+    isdelModalOpen.value = false;
+    delId.value = null;
   };
 
   const openModal = (user?: User) => {
@@ -133,8 +175,10 @@ export function useUserManagement() {
     try {
       if (isEditing.value && editingId.value) {
         await userApi.update(editingId.value, dataToSave);
+        triggerToast(`User ${editingId.value} updated successfully`);
       } else {
         await userApi.create(dataToSave);
+        triggerToast(`User ${dataToSave.name} created successfully`);
       }
       isModalOpen.value = false;
       queryParams.value.page = 1;
@@ -146,6 +190,17 @@ export function useUserManagement() {
 
   const closeModal = () => {
     isModalOpen.value = false;
+  };
+
+  const triggerToast = (msg: string, type: ToastType = 'success') => {
+    toastMessage.value = msg;
+    toastType.value = type;
+    showToast.value = true;
+
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      showToast.value = false;
+    }, 3000); // 3秒後自動消失
   };
   const loadNextPage = () => {
     if (isLoading.value || !hasMore.value) return;
@@ -172,5 +227,11 @@ export function useUserManagement() {
     saveUser,
     closeModal,
     loadNextPage,
+    closeDelModal,
+    isdelModalOpen,
+    triggerDeleteModal,
+    toastMessage,
+    toastType,
+    showToast,
   };
 }
