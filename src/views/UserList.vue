@@ -99,12 +99,13 @@ const {
 const searchInput = ref('');
 const bottomTrigger = ref<HTMLElement | null>(null);
 
-type SortKey = 'name' | 'position' | 'age' | 'location';
+type SortKey = 'name' | 'position' | 'age' | 'location' | 'birthdate';
 
 const tableColumns: { key: SortKey; label: string }[] = [
   { key: 'name', label: 'Name' },
   { key: 'position', label: 'Position' },
   { key: 'age', label: 'Age' },
+  { key: 'birthdate', label: 'Birthdate' },
   { key: 'location', label: 'Location' },
 ];
 
@@ -113,7 +114,7 @@ const {
   containerProps,
   wrapperProps,
 } = useVirtualList(users, {
-  itemHeight: 96,
+  itemHeight: 120,
   overscan: 5,
 });
 

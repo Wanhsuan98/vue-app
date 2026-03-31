@@ -1,6 +1,6 @@
 <template>
   <div
-    class="hidden md:grid grid-cols-5 bg-gray-100 border-b border-gray-200 p-4 text-sm font-semibold text-gray-600"
+    class="hidden md:grid grid-cols-6 bg-gray-100 border-b border-gray-200 p-4 text-sm font-semibold text-gray-600"
   >
     <div
       v-for="col in columns"
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
 
-type SortKey = 'name' | 'position' | 'age' | 'location';
+type SortKey = 'name' | 'position' | 'age' | 'location' | 'birthdate';
 
 defineProps<{
   columns: { key: SortKey; label: string }[];
