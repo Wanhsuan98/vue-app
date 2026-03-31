@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PlusIcon, ChevronDownIcon } from '@heroicons/vue/24/outline';
 
 defineProps<{
   modelValue: string;
@@ -70,6 +70,10 @@ const sortOptions = {
   'name-desc': 'Name (Z-A)',
   'age-asc': 'Age (Low-High)',
   'age-desc': 'Age (High-Low)',
+  'location-asc': 'Location (A-Z)',
+  'location-desc': 'Location (Z-A)',
+  'position-asc': 'Position (A-Z)',
+  'position-desc': 'Position (Z-A)',
 };
 
 const currentSortLabel = computed(
