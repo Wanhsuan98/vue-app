@@ -8,37 +8,28 @@
         <input
           :value="modelValue"
           type="text"
-          aria-label="Search users by name, position, or location"
+          aria-label="Search users"
           placeholder="Search users..."
-          class="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:border-blue-500 focus:outline-none"
+          class="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:border-sky-500 focus:outline-none"
           @input="onInput"
         />
       </div>
+
+      <button
+        @click="$emit('open-modal')"
+        class="flex items-center justify-center gap-2 rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-white hover:bg-sky-600 transition-colors duration-300 ease-in-out md:ml-2"
+      >
+        Add
+        <PlusIcon class="h-5 w-5" />
+      </button>
     </div>
 
-    <div class="mt-3 flex items-center justify-between rounded-md bg-gray-50 p-2 md:hidden">
-      <span class="text-sm font-medium text-gray-500">Sort by:</span>
-      <select
-        aria-label="Sort users"
-        class="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
-        @change="$emit('mobile-sort', $event)"
-      >
-        <option value="">Default (預設)</option>
-        <option value="name-asc">Name (A-Z)</option>
-        <option value="name-desc">Name (Z-A)</option>
-        <option value="position-asc">Position (A-Z)</option>
-        <option value="position-desc">Position (Z-A)</option>
-        <option value="age-asc">Age (Low-High)</option>
-        <option value="age-desc">Age (High-Low)</option>
-        <option value="location-asc">Location (A-Z)</option>
-        <option value="location-desc">Location (Z-A)</option>
-      </select>
-    </div>
+    <div class="mt-3 flex items-center justify-between rounded-md bg-gray-50 p-2 md:hidden"></div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/vue/24/outline';
 
 defineProps<{
   modelValue: string;
@@ -48,6 +39,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void;
   (e: 'search'): void;
   (e: 'mobile-sort', event: Event): void;
+  (e: 'open-modal'): void;
 }>();
 
 const onInput = (event: Event) => {

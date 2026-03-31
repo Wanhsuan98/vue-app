@@ -12,6 +12,9 @@ export function useUserManagement() {
   const isError = ref<string | null>(null);
   const totalCount = ref(0);
   const hasMore = ref(true);
+  const isModalOpen = ref(false);
+  const isEditing = ref(false);
+  const editingId = ref<string | null>(null);
 
   const queryParams = ref<QueryParams>({
     q: '',
@@ -19,6 +22,14 @@ export function useUserManagement() {
     order: 'asc',
     page: 1,
     limit: 500,
+  });
+
+  const formData = ref<User>({
+    name: '',
+    position: '',
+    location: '',
+    age: 0,
+    birthdate: '',
   });
 
   let abortController: AbortController | null = null;
@@ -81,6 +92,61 @@ export function useUserManagement() {
     fetchUsers(false);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure to delete this user?')) return;
+    try {
+      await userApi.remove(id);
+      queryParams.value.page = 1;
+      fetchUsers();
+    } catch (error) {
+      console.error('Delete failed', error);
+    }
+  };
+
+  const openModal = (user?: User) => {
+    if (user) {
+      isEditing.value = true;
+      editingId.value = user.id ?? null;
+      Object.assign(formData.value, {
+        name: user.name,
+        position: user.position,
+        age: user.age,
+        location: user.location,
+        birthdate: user.birthdate,
+      });
+    } else {
+      isEditing.value = false;
+      editingId.value = null;
+      Object.assign(formData.value, {
+        name: '',
+        position: '',
+        location: '',
+        age: 0,
+        birthdate: '',
+      });
+    }
+    isModalOpen.value = true;
+  };
+
+  const saveUser = async (userData?: User) => {
+    const dataToSave = userData || formData.value;
+    try {
+      if (isEditing.value && editingId.value) {
+        await userApi.update(editingId.value, dataToSave);
+      } else {
+        await userApi.create(dataToSave);
+      }
+      isModalOpen.value = false;
+      queryParams.value.page = 1;
+      fetchUsers();
+    } catch (error) {
+      console.error('Save failed', error);
+    }
+  };
+
+  const closeModal = () => {
+    isModalOpen.value = false;
+  };
   const loadNextPage = () => {
     if (isLoading.value || !hasMore.value) return;
     queryParams.value.page += 1;
@@ -94,10 +160,17 @@ export function useUserManagement() {
     isError,
     totalCount,
     hasMore,
+    isModalOpen,
+    isEditing,
+    formData,
     queryParams,
     fetchUsers,
     handleSearch,
     handleSort,
+    handleDelete,
+    openModal,
+    saveUser,
+    closeModal,
     loadNextPage,
   };
 }

@@ -26,6 +26,7 @@ const STATIC_USER: User = {
 };
 mockDatabase.push(STATIC_USER);
 
+// --- 取得列表 ---
 mock.onGet('/users').reply((config) => {
   const params = config.params as QueryParams;
   const { q = '', sortBy, order, page, limit } = params;
@@ -56,6 +57,7 @@ mock.onGet('/users').reply((config) => {
     filtered.sort((a, b) => {
       const valueA = a[sortBy as keyof User];
       const valueB = b[sortBy as keyof User];
+      if (valueA === undefined || valueB === undefined) return 0;
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
       return 0;
@@ -76,6 +78,31 @@ mock.onGet('/users').reply((config) => {
   ];
 });
 
+// --- 新增 ---
+mock.onPost('/users').reply((config) => {
+  const data = JSON.parse(config.data);
+  const newUser: User = {
+    ...data,
+    id: `u_${Date.now()}`, // 模擬後端產生唯一ID
+  };
+  mockDatabase.unshift(newUser);
+  return [200, newUser];
+});
+
+// --- 編輯 ---
+mock.onPut(/\/users\/.+/).reply((config) => {
+  const id = config.url?.split('/').pop();
+  const data = JSON.parse(config.data);
+
+  const index = mockDatabase.findIndex((u) => u.id === id);
+  if (index > -1) {
+    mockDatabase[index] = { ...mockDatabase[index], ...data };
+    return [200, mockDatabase[index]];
+  }
+  return [404, { message: 'User not found' }];
+});
+
+// --- 刪除 ---
 mock.onDelete(/\/users\/u_\d+/).reply((config) => {
   const id = config.url?.split('/').pop();
   if (id) {

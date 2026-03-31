@@ -1,10 +1,13 @@
 <template>
   <div class="flex h-screen flex-col box-border p-4">
-    <UserSearchHeader v-model="searchInput" @search="onSearchInput" @mobile-sort="onMobileSort" />
+    <UserSearchHeader
+      v-model="searchInput"
+      @search="onSearchInput"
+      @mobile-sort="onMobileSort"
+      @open-modal="openModal"
+    />
 
     <main class="flex flex-1 flex-col overflow-hidden rounded-lg border border-gray-200">
-      <div v-if="staticUser" class="..."></div>
-
       <UserTableHeader
         :columns="tableColumns"
         :sort-by="queryParams.sortBy"
@@ -12,9 +15,25 @@
         @sort="handleSort"
       />
 
+      <div v-if="staticUser" class="bg-sky-50 border-b border-sky-200">
+        <UserListItem
+          :user="staticUser"
+          :is-static="true"
+          @edit="openModal"
+          @delete="handleDelete"
+        />
+      </div>
+
       <div v-bind="containerProps" class="flex-1 overflow-y-auto">
         <div v-bind="wrapperProps">
-          <UserListItem v-for="item in virtualList" :key="item.data.id" :user="item.data" />
+          <UserListItem
+            v-for="item in virtualList"
+            :key="item.data.id"
+            :user="item.data"
+            :is-static="false"
+            @edit="openModal"
+            @delete="handleDelete"
+          />
 
           <div
             ref="bottomTrigger"
@@ -26,6 +45,14 @@
         </div>
       </div>
     </main>
+
+    <UserFormModal
+      :is-open="isModalOpen"
+      :is-editing="isEditing"
+      :form-data="formData"
+      @close="closeModal"
+      @save="saveUser"
+    />
   </div>
 </template>
 
@@ -37,6 +64,7 @@ import { useUserManagement } from '@/composables/useUserManagement';
 import UserSearchHeader from '@/components/UserSearchHeader.vue';
 import UserTableHeader from '@/components/UserTableHeader.vue';
 import UserListItem from '@/components/UserListItem.vue';
+import UserFormModal from '@/components/UserFormModal.vue';
 
 const {
   users,
@@ -48,6 +76,13 @@ const {
   handleSearch,
   handleSort,
   loadNextPage,
+  isModalOpen,
+  isEditing,
+  formData,
+  openModal,
+  handleDelete,
+  saveUser,
+  closeModal,
 } = useUserManagement();
 
 const searchInput = ref('');
