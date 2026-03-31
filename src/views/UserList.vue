@@ -20,7 +20,7 @@
           :user="staticUser"
           :is-static="true"
           @edit="openModal"
-          @delete="handleDelete"
+          @delete="triggerDeleteModal"
         />
       </div>
 
@@ -32,7 +32,7 @@
             :user="item.data"
             :is-static="false"
             @edit="openModal"
-            @delete="handleDelete"
+            @delete="triggerDeleteModal"
           />
 
           <div
@@ -53,6 +53,9 @@
       @close="closeModal"
       @save="saveUser"
     />
+
+    <ConfirmDeleteModal :is-open="isdelModalOpen" @cancel="closeDelModal" @confirm="handleDelete" />
+    <ToastNotification :show="showToast" :message="toastMessage" :type="toastType" />
   </div>
 </template>
 
@@ -65,6 +68,8 @@ import UserSearchHeader from '@/components/UserSearchHeader.vue';
 import UserTableHeader from '@/components/UserTableHeader.vue';
 import UserListItem from '@/components/UserListItem.vue';
 import UserFormModal from '@/components/UserFormModal.vue';
+import ConfirmDeleteModal from '@/components/ConfirmDeleteModal.vue';
+import ToastNotification from '@/components/ToastNotification.vue';
 
 const {
   users,
@@ -83,6 +88,12 @@ const {
   handleDelete,
   saveUser,
   closeModal,
+  isdelModalOpen,
+  closeDelModal,
+  triggerDeleteModal,
+  toastMessage,
+  toastType,
+  showToast,
 } = useUserManagement();
 
 const searchInput = ref('');

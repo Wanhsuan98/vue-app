@@ -2,6 +2,8 @@ import MockAdapter from 'axios-mock-adapter';
 import api from '@/apis/api';
 import type { User, QueryParams } from '@/types';
 
+let isStaticDeleted = false;
+
 // 模擬打 API 的延遲
 const mock = new MockAdapter(api, { delayResponse: 500 });
 
@@ -73,7 +75,7 @@ mock.onGet('/users').reply((config) => {
     {
       data: pagination,
       total: filtered.length,
-      staticUser: returnedStaticUser,
+      staticUser: isStaticDeleted ? null : returnedStaticUser,
     },
   ];
 });
@@ -103,11 +105,19 @@ mock.onPut(/\/users\/.+/).reply((config) => {
 });
 
 // --- 刪除 ---
-mock.onDelete(/\/users\/u_\d+/).reply((config) => {
+mock.onDelete(/\/users\/.+/).reply((config) => {
   const id = config.url?.split('/').pop();
-  if (id) {
+
+  if (id === 'Leader_1') {
+    isStaticDeleted = true;
+    return [200, { success: true }];
+  }
+
+  const exists = mockDatabase.some((u) => u.id === id);
+  if (exists) {
     mockDatabase = mockDatabase.filter((u) => u.id !== id);
     return [200, { success: true }];
   }
-  return [400, { message: 'Bad Request' }];
+
+  return [404, { message: 'User not found' }];
 });
