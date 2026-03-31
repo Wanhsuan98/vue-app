@@ -76,7 +76,9 @@ export function useUserManagement() {
       }
 
       totalCount.value = total;
-      hasMore.value = users.value.length < total;
+
+      const totalPages = Math.ceil(total / queryParams.value.limit);
+      hasMore.value = queryParams.value.page < totalPages && data.length > 0;
     } catch (err: unknown) {
       if (axios.isCancel(err)) {
         return;
